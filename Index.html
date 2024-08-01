@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friday Night Funkin' Clone</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+        }
+        canvas {
+            display: block;
+        }
+        #start-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px 40px;
+            background: #ff69b4;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <button id="start-button">Start Game</button>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const context = canvas.getContext('2d');
+        const startButton = document.getElementById('start-button');
+        let gameRunning = false;
+
+        // Set canvas size to fill the screen
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Game variables
+        const keys = [];
+        const notes = [];
+        const speed = 5;
+        let score = 0;
+
+        // Note object
+        class Note {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+            }
+
+            draw() {
+                context.fillStyle = this.color;
+                context.fillRect(this.x, this.y, 50, 20);
+            }
+
+            update() {
+                this.y += speed;
+                this.draw();
+            }
+        }
+
+        // Add notes to the array
+        function spawnNote() {
+            const x = Math.random() * (canvas.width - 50);
+            notes.push(new Note(x, 0, 'pink'));
+        }
+
+        // Start game function
+        function startGame() {
+            gameRunning = true;
+            startButton.style.display = 'none';
+            setInterval(spawnNote, 1000);
+            animate();
+        }
+
+        // Animation loop
+        function animate() {
+            if (gameRunning) {
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                notes.forEach((note, index) => {
+                    note.update();
+                    if (note.y > canvas.height) {
+                        notes.splice(index, 1);
+                        gameRunning = false;
+                        alert('Game Over! Score: ' + score);
+                        window.location.reload();
+                    }
+                });
+                requestAnimationFrame(animate);
+            }
+        }
+
+        // Event listeners for key presses
+        window.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+
+        window.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+
+        // Start game on button click
+        startButton.addEventListener('click', startGame);
+    </script>
+</body>
+</html>
